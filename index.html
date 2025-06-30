@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Travel Assistant - Your Smart Travel Companion</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .chat-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+        
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: messageSlide 0.3s ease-out;
+        }
+        
+        .user-message {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            background: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .input-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-voice {
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-voice.listening {
+            background: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .features-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .itinerary-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .itinerary-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .price-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .price-option {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .price-best {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+        
+        .price-good {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+        
+        .price-average {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+        
+        .translation-bar {
+            background: #17a2b8;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .ar-preview {
+            background: #343a40;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.5s ease-out;
+            z-index: 1000;
+        }
+        
+        .offline-indicator {
+            background: #dc3545;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes messageSlide {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .chat-section {
+                height: 500px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .price-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Mock storage service (replace with localStorage in production)
+        class StorageService {
+            constructor() {
+                this.data = new Map();
+            }
+            
+            setItem(key, value) {
+                this.data.set(key, JSON.stringify(value));
+            }
+            
+            getItem(key) {
+                const item = this.data.get(key);
+                return item ? JSON.parse(item) : null;
+            }
+            
+            removeItem(key) {
+                this.data.delete(key);
+            }
+        }
+
+        const storage = new StorageService();
+
+        // Mock API Service for travel bookings and data
+        class TravelAPIService {
+            constructor() {
+                this.isOffline = false;
+                this.mockDelay = 1000; // Simulate network delay
+            }
+
+            async mockApiCall(data, delay = this.mockDelay) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (this.isOffline && Math.random() > 0.7) {
+                            reject(new Error('Network unavailable - using offline mode'));
+                        } else {
+                            resolve(data);
+                        }
+                    }, delay);
+                });
+            }
+
+            async searchFlights(query) {
+                const mockFlights = [
+                    { id: 1, airline: "SkyLine Airways", price: 450, duration: "8h 30m", departure: "10:30 AM", arrival: "7:00 PM" },
+                    { id: 2, airline: "Global Wings", price: 380, duration: "9h 15m", departure: "2:15 PM", arrival: "11:30 PM" },
+                    { id: 3, airline: "FastJet", price: 520, duration: "7h 45m", departure: "6:45 AM", arrival: "2:30 PM" }
+                ];
+                return this.mockApiCall(mockFlights);
+            }
+
+            async searchHotels(location) {
+                const mockHotels = [
+                    { id: 1, name: "Grand Palace Hotel", price: 120, rating: 4.5, amenities: ["WiFi", "Pool", "Spa"] },
+                    { id: 2, name: "Budget Stay Inn", price: 80, rating: 4.0, amenities: ["WiFi", "Breakfast"] },
+                    { id: 3, name: "Luxury Resort", price: 250, rating: 5.0, amenities: ["WiFi", "Pool", "Spa", "Restaurant"] }
+                ];
+                return this.mockApiCall(mockHotels);
+            }
+
+            async getUniqueDestinations(location) {
+                const mockDestinations = [
+                    { name: "Hidden Temple", description: "Ancient temple off the beaten path", popularity: "Low" },
+                    { name: "Secret Garden Cafe", description: "Local favorite rooftop garden", popularity: "Medium" },
+                    { name: "Underground Art Gallery", description: "Contemporary art in historic tunnels", popularity: "High" }
+                ];
+                return this.mockApiCall(mockDestinations);
+            }
+
+            async translateText(text, targetLang) {
+                const mockTranslations = {
+                    'es': text.replace(/hello/gi, 'hola').replace(/thank you/gi, 'gracias'),
+                    'fr': text.replace(/hello/gi, 'bonjour').replace(/thank you/gi, 'merci'),
+                    'ja': text.replace(/hello/gi, 'こんにちは').replace(/thank you/gi, 'ありがとう')
+                };
+                return this.mockApiCall(mockTranslations[targetLang] || text, 500);
+            }
+
+            async getBudgetSuggestions(budget, destination) {
+                const suggestions = {
+                    accommodation: Math.floor(budget * 0.4),
+                    food: Math.floor(budget * 0.3),
+                    activities: Math.floor(budget * 0.2),
+                    transport: Math.floor(budget * 0.1)
+                };
+                return this.mockApiCall(suggestions);
+            }
+
+            async getRouteOptions(from, to) {
+                const routes = [
+                    { type: "Flight", duration: "3h 20m", price: 250, co2: "High" },
+                    { type: "Train", duration: "8h 15m", price: 120, co2: "Low" },
+                    { type: "Bus", duration: "12h 30m", price: 45, co2: "Medium" },
+                    { type: "Uber", duration: "6h 45m", price: 180, co2: "Medium" }
+                ];
+                return this.mockApiCall(routes);
+            }
+        }
+
+        const apiService = new TravelAPIService();
+
+        // Natural Language Processing Service
+        class NLPService {
+            processQuery(query) {
+                const lowerQuery = query.toLowerCase();
+                
+                if (lowerQuery.includes('book') && lowerQuery.includes('flight')) {
+                    const destination = this.extractDestination(lowerQuery);
+                    return { intent: 'book_flight', destination };
+                }
+                
+                if (lowerQuery.includes('hotel') || lowerQuery.includes('accommodation')) {
+                    const location = this.extractDestination(lowerQuery);
+                    return { intent: 'find_hotel', location };
+                }
+                
+                if (lowerQuery.includes('unique') || lowerQuery.includes('hidden') || lowerQuery.includes('secret')) {
+                    const location = this.extractDestination(lowerQuery);
+                    return { intent: 'unique_places', location };
+                }
+                
+                if (lowerQuery.includes('budget') || lowerQuery.includes('cost') || lowerQuery.includes('price')) {
+                    return { intent: 'budget_planning', query };
+                }
+                
+                if (lowerQuery.includes('translate')) {
+                    return { intent: 'translate', text: query };
+                }
+                
+                if (lowerQuery.includes('route') || lowerQuery.includes('transport')) {
+                    return { intent: 'route_planning', query };
+                }
+                
+                return { intent: 'general', query };
+            }
+            
+            extractDestination(query) {
+                const destinations = ['tokyo', 'paris', 'london', 'new york', 'rome', 'bali', 'thailand', 'japan'];
+                for (const dest of destinations) {
+                    if (query.includes(dest)) {
+                        return dest.charAt(0).toUpperCase() + dest.slice(1);
+                    }
+                }
+                return 'Unknown Destination';
+            }
+        }
+
+        const nlpService = new NLPService();
+
+        // Voice Recognition Service
+        class VoiceService {
+            constructor() {
+                this.recognition = null;
+                this.isSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+                
+                if (this.isSupported) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = 'en-US';
+                }
+            }
+            
+            async startListening() {
+                return new Promise((resolve, reject) => {
+                    if (!this.isSupported) {
+                        reject(new Error('Voice recognition not supported'));
+                        return;
+                    }
+                    
+                    this.recognition.onresult = (event) => {
+                        const result = event.results[0][0].transcript;
+                        resolve(result);
+                    };
+                    
+                    this.recognition.onerror = (event) => {
+                        reject(new Error(`Voice recognition error: ${event.error}`));
+                    };
+                    
+                    this.recognition.start();
+                });
+            }
+        }
+
+        const voiceService = new VoiceService();
+
+        // Main Travel Assistant Component
+        function TravelAssistant() {
+            const [messages, setMessages] = useState([
+                { type: 'bot', content: 'Hello! I\'m your AI travel assistant. Try asking me to "Book a flight to Tokyo" or "Find unique places in Paris"!' }
+            ]);
+            const [inputValue, setInputValue] = useState('');
+            const [isListening, setIsListening] = useState(false);
+            const [isLoading, setIsLoading] = useState(false);
+            const [loyaltyPoints, setLoyaltyPoints] = useState(1250);
+            const [currentLanguage, setCurrentLanguage] = useState('en');
+            const [notifications, setNotifications] = useState([]);
+            const [itinerary, setItinerary] = useState([]);
+            const [isOffline, setIsOffline] = useState(false);
+            const [travelLog, setTravelLog] = useState([]);
+            const [priceComparisons, setPriceComparisons] = useState([]);
+            
+            const messagesEndRef = useRef(null);
+
+            // Auto-scroll to latest message
+            useEffect(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, [messages]);
+
+            // Simulate network status
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    setIsOffline(Math.random() > 0.9); // 10% chance of being offline
+                }, 5000);
+                return () => clearInterval(interval);
+            }, []);
+
+            // Load cached data on mount
+            useEffect(() => {
+                const cachedItinerary = storage.getItem('itinerary');
+                const cachedTravelLog = storage.getItem('travelLog');
+                const cachedPoints = storage.getItem('loyaltyPoints');
+                
+                if (cachedItinerary) setItinerary(cachedItinerary);
+                if (cachedTravelLog) setTravelLog(cachedTravelLog);
+                if (cachedPoints) setLoyaltyPoints(cachedPoints);
+            }, []);
+
+            // Auto-save to cache
+            useEffect(() => {
+                storage.setItem('itinerary', itinerary);
+            }, [itinerary]);
+
+            useEffect(() => {
+                storage.setItem('travelLog', travelLog);
+            }, [travelLog]);
+
+            useEffect(() => {
+                storage.setItem('loyaltyPoints', loyaltyPoints);
+            }, [loyaltyPoints]);
+
+            // Add notification
+            const addNotification = (message, type = 'success') => {
+                const id = Date.now();
+                setNotifications(prev => [...prev, { id, message, type }]);
+                setTimeout(() => {
+                    setNotifications(prev => prev.filter(n => n.id !== id));
+                }, 3000);
+            };
+
+            // Process user message with NLP
+            const processMessage = async (message) => {
+                const nlpResult = nlpService.processQuery(message);
+                setIsLoading(true);
+                
+                try {
+                    let response = '';
+                    
+                    switch (nlpResult.intent) {
+                        case 'book_flight':
+                            const flights = await apiService.searchFlights(nlpResult.destination);
+                            response = `Found ${flights.length} flights to ${nlpResult.destination}:\n\n`;
+                            flights.forEach((flight, index) => {
+                                response += `${index + 1}. ${flight.airline} - $${flight.price} (${flight.duration})\n   Departure: ${flight.departure} → Arrival: ${flight.arrival}\n\n`;
+                            });
+                            
+                            // Add to itinerary
+                            setItinerary(prev => [...prev, {
+                                id: Date.now(),
+                                type: 'Flight',
+                                destination: nlpResult.destination,
+                                details: flights[0],
+                                date: new Date().toLocaleDateString()
+                            }]);
+                            
+                            // Award loyalty points
+                            setLoyaltyPoints(prev => prev + 100);
+                            addNotification('Flight search completed! +100 loyalty points earned');
+                            break;
+                            
+                        case 'find_hotel':
+                            const hotels = await apiService.searchHotels(nlpResult.location);
+                            response = `Found ${hotels.length} hotels in ${nlpResult.location}:\n\n`;
+                            hotels.forEach((hotel, index) => {
+                                response += `${index + 1}. ${hotel.name} - $${hotel.price}/night (${hotel.rating}⭐)\n   Amenities: ${hotel.amenities.join(', ')}\n\n`;
+                            });
+                            
+                            // Set price comparisons
+                            setPriceComparisons([
+                                { name: hotels[0].name, price: hotels[0].price, type: 'best' },
+                                { name: hotels[1].name, price: hotels[1].price, type: 'good' },
+                                { name: hotels[2].name, price: hotels[2].price, type: 'average' }
+                            ]);
+                            break;
+                            
+                        case 'unique_places':
+                            const destinations = await apiService.getUniqueDestinations(nlpResult.location);
+                            response = `Here are some unique places in ${nlpResult.location}:\n\n`;
+                            destinations.forEach((place, index) => {
+                                response += `${index + 1}. ${place.name}\n   ${place.description}\n   Popularity: ${place.popularity}\n\n`;
+                            });
+                            break;
+                            
+                        case 'budget_planning':
+                            const budget = await apiService.getBudgetSuggestions(1000, 'destination');
+                            response = `Here's your recommended budget breakdown for a $1000 trip:\n\n`;
+                            response += `🏨 Accommodation: $${budget.accommodation}\n`;
+                            response += `🍽️ Food: $${budget.food}\n`;
+                            response += `🎯 Activities: $${budget.activities}\n`;
+                            response += `🚗 Transport: $${budget.transport}\n`;
+                            break;
+                            
+                        case 'route_planning':
+                            const routes = await apiService.getRouteOptions('Current Location', 'Destination');
+                            response = `Here are your transport options:\n\n`;
+                            routes.forEach((route, index) => {
+                                response += `${index + 1}. ${route.type} - $${route.price} (${route.duration})\n   CO2 Impact: ${route.co2}\n\n`;
+                            });
+                            break;
+                            
+                        default:
+                            response = "I can help you with booking flights, finding hotels, discovering unique places, budget planning, and route suggestions. Try asking me something like 'Book a flight to Tokyo' or 'Find unique places in Paris'!";
+                    }
+                    
+                    setMessages(prev => [...prev, { type: 'bot', content: response }]);
+                    
+                } catch (error) {
+                    console.error('API Error:', error);
+                    let errorResponse = "I'm having trouble connecting to our services. ";
+                    if (isOffline) {
+                        errorResponse += "It looks like you're offline. I'll use cached data when possible.";
+                    } else {
+                        errorResponse += "Please try again in a moment.";
+                    }
+                    setMessages(prev => [...prev, { type: 'bot', content: errorResponse }]);
+                    addNotification('Service temporarily unavailable', 'error');
+                }
+                
+                setIsLoading(false);
+            };
+
+            // Handle sending message
+            const handleSendMessage = async () => {
+                if (!inputValue.trim()) return;
+                
+                const userMessage = inputValue.trim();
+                setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
+                setInputValue('');
+                
+                await processMessage(userMessage);
+            };
+
+            // Handle voice input
+            const handleVoiceInput = async () => {
+                if (!voiceService.isSupported) {
+                    addNotification('Voice recognition not supported in this browser', 'error');
+                    return;
+                }
+                
+                setIsListening(true);
+                try {
+                    const result = await voiceService.startListening();
+                    setInputValue(result);
+                    addNotification('Voice input captured successfully!');
+                } catch (error) {
+                    console.error('Voice input error:', error);
+                    addNotification('Voice input failed. Please try again.', 'error');
+                } finally {
+                    setIsListening(false);
+                }
+            };
+
+            // Handle key press
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                }
+            };
+
+            // Translate current input
+            const handleTranslate = async (targetLang) => {
+                if (!inputValue.trim()) return;
+                
+                try {
+                    const translated = await apiService.translateText(inputValue, targetLang);
+                    setInputValue(translated);
+                    setCurrentLanguage(targetLang);
+                    addNotification(`Translated to ${targetLang.toUpperCase()}`);
+                } catch (error) {
+                    addNotification('Translation failed', 'error');
+                }
+            };
+
+            // Generate share link for itinerary
+            const generateShareLink = () => {
+                const shareData = {
+                    itinerary,
+                    travelLog,
+                    timestamp: Date.now()
+                };
+                const shareId = btoa(JSON.stringify(shareData));
+                const shareUrl = `${window.location.origin}/shared/${shareId}`;
+                
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    addNotification('Itinerary link copied to clipboard!');
+                }).catch(() => {
+                    addNotification('Failed to copy link', 'error');
+                });
+            };
+
+            return (
+                <div className="container">
+                    {/* Offline Indicator */}
+                    {isOffline && (
+                        <div className="offline-indicator">
+                            📱 Offline Mode
+                        </div>
+                    )}
+
+                    {/* Notifications */}
+                    {notifications.map(notification => (
+                        <div key={notification.id} className="notification">
+                            {notification.message}
+                        </div>
+                    ))}
+
+                    {/* Header */}
+                    <div className="header">
+                        <div className="logo">🌍 AI Travel Assistant</div>
+                        <div style={{ textAlign: 'center', color: '#666', fontSize: '0.9rem' }}>
+                            Your intelligent travel companion powered by AI
+                        </div>
+                    </div>
+
+                    <div className="main-content">
+                        {/* Chat Interface */}
+                        <div className="chat-section">
+                            <div className="chat-header">
+                                <h3>💬 Chat Assistant</h3>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button 
+                                        className="btn btn-secondary"
+                                        onClick={() => handleTranslate('es')}
+                                        style={{ padding: '5px 10px', fontSize: '0.8rem' }}
+                                    >
+                                        ES
+                                    </button>
+                                    <button 
+                                        className="btn btn-secondary"
+                                        onClick={() => handleTranslate('fr')}
+                                        style={{ padding: '5px 10px', fontSize: '0.8rem' }}
+                                    >
+                                        FR
+                                    </button>
+                                    <button 
+                                        className="btn btn-secondary"
+                                        onClick={() => handleTranslate('ja')}
+                                        style={{ padding: '5px 10px', fontSize: '0.8rem' }}
+                                    >
+                                        JP
+                                    </button>
+                                </div>
+                            </div>
+
+                            {currentLanguage !== 'en' && (
+                                <div className="translation-bar">
+                                    🌐 Translation Mode: {currentLanguage.toUpperCase()}
+                                </div>
+                            )}
+
+                            <div className="chat-messages">
+                                {messages.map((message, index) => (
+                                    <div 
+                                        key={index} 
+                                        className={`message ${message.type === 'user' ? 'user-message' : 'bot-message'}`}
+                                    >
+                                        {message.content}
+                                    </div>
+                                ))}
+                                {isLoading && (
+                                    <div className="message bot-message">
+                                        <div className="loading"></div> Processing your request...
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            <div className="input-section">
+                                <input
+                                    type="text"
+                                    className="chat-input"
+                                    placeholder="Try: 'Book a flight to Tokyo' or 'Find unique places in Paris'"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                />
+                                <button 
+                                    className={`btn btn-voice ${isListening ? 'listening' : ''}`}
+                                    onClick={handleVoiceInput}
+                                    title="Voice Input"
+                                >
+                                    🎤
+                                </button>
+                                <button 
+                                    className="btn btn-primary"
+                                    onClick={handleSendMessage}
+                                >
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Features Section */}
+                        <div className="features-section">
+                            {/* Loyalty Points & Stats */}
+                            <div className="feature-card">
+                                <div className="feature-title">🏆 Your Travel Stats</div>
+                                <div className="stats-grid">
+                                    <div className="stat-item">
+                                        <div className="stat-value">{loyaltyPoints}</div>
+                                        <div className="stat-label">Loyalty Points</div>
+                                    </div>
+                                    <div className="stat-item">
+                                        <div className="stat-value">{itinerary.length}</div>
+                                        <div className="stat-label">Bookings</div>
+                                    </div>
+                                    <div className="stat-item">
+                                        <div className="stat-value">{travelLog.length}</div>
+                                        <div className="stat-label">Places Visited</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Price Comparison */}
+                            {priceComparisons.length > 0 && (
+                                <div className="feature-card">
+                                    <div className="feature-title">💰 Price Comparison</div>
+                                    <div className="price-comparison">
+                                        {priceComparisons.map((option, index) => (
+                                            <div key={index} className={`price-option price-${option.type}`}>
+                                                <div>{option.name}</div>
+                                                <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+                                                    ${option.price}/night
+                                                </div>
+                                                <div style={{ fontSize: '0.8rem' }}>
+                                                    {option.type === 'best' ? '🏅 Best Deal' : 
+                                                     option.type === 'good' ? '👍 Good Value' : 
+                                                     '⚠️ Higher Cost'}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* AR Preview Placeholder */}
+                            <div className="feature-card">
+                                <div className="feature-title">🥽 AR Preview (Coming Soon)</div>
+                                <div className="ar-preview">
+                                    <div style={{ fontSize: '2rem', marginBottom: '10px' }}>📱</div>
+                                    <div>Augmented Reality hotel and attraction previews will be available soon!</div>
+                                    <div style={{ fontSize: '0.9rem', marginTop: '10px', opacity: 0.8 }}>
+                                        Using AR.js technology for immersive travel experiences
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Current Itinerary */}
+                            <div className="feature-card">
+                                <div className="feature-title">📅 Your Itinerary</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                                    <span>{itinerary.length} items</span>
+                                    <button 
+                                        className="btn btn-secondary"
+                                        onClick={generateShareLink}
+                                        style={{ padding: '5px 15px', fontSize: '0.8rem' }}
+                                    >
+                                        Share 🔗
+                                    </button>
+                                </div>
+                                
+                                {itinerary.length === 0 ? (
+                                    <div style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                                        No bookings yet. Start planning your trip!
+                                    </div>
+                                ) : (
+                                    itinerary.map((item, index) => (
+                                        <div key={item.id} className="itinerary-item">
+                                            <div style={{ fontWeight: '600' }}>
+                                                {item.type} to {item.destination}
+                                            </div>
+                                            <div style={{ fontSize: '0.9rem', color: '#666' }}>
+                                                {item.date} • ${item.details.price}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* Local Recommendations */}
+                            <div className="feature-card">
+                                <div className="feature-title">⭐ Local Recommendations</div>
+                                <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '15px' }}>
+                                    Verified by local experts and travelers
+                                </div>
+                                
+                                <div className="itinerary-item">
+                                    <div style={{ fontWeight: '600' }}>🍜 Ramen Yamashita</div>
+                                    <div style={{ fontSize: '0.9rem' }}>
+                                        ⭐⭐⭐⭐⭐ (127 reviews) • "Best ramen in Tokyo!" - Sarah M.
+                                    </div>
+                                </div>
+                                
+                                <div className="itinerary-item">
+                                    <div style={{ fontWeight: '600' }}>🏛️ Hidden Temple Garden</div>
+                                    <div style={{ fontSize: '0.9rem' }}>
+                                        ⭐⭐⭐⭐ (89 reviews) • "Peaceful escape from the city" - John D.
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Travel Log */}
+                            <div className="feature-card">
+                                <div className="feature-title">📍 Travel Log</div>
+                                <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '15px' }}>
+                                    Automatically tracked visited places
+                                </div>
+                                
+                                {travelLog.length === 0 ? (
+                                    <div style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                                        Start traveling to build your log!
+                                    </div>
+                                ) : (
+                                    travelLog.map((log, index) => (
+                                        <div key={index} className="itinerary-item">
+                                            <div style={{ fontWeight: '600' }}>{log.place}</div>
+                                            <div style={{ fontSize: '0.9rem', color: '#666' }}>
+                                                {log.date} • {log.duration}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render the application
+        ReactDOM.render(<TravelAssistant />, document.getElementById('root'));
+    </script>
+</body>
+</html>
