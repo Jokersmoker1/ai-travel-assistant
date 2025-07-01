@@ -1252,10 +1252,29 @@
                                 response += `   😌 Comfort: ${route.comfort}\n\n`;
                             });
                             break;
-                            
-                        default:
-                            response = "🤖 I'm your intelligent travel companion! I can help you with:\n\n✈️ Book flights and compare prices\n🏨 Find hotels with best deals\n🚗 Book Uber rides instantly\n🍽️ Discover amazing restaurants\n✨ Find unique hidden places\n💰 Plan your travel budget\n🌤️ Check weather forecasts\n🎁 Get exclusive loyalty deals\n\nTry asking: 'Book an Uber to the airport' or 'Find unique places in Tokyo'!";
-                    }
+default:
+    try {
+        const chatResponse = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message
+            })
+        });
+        
+        if (chatResponse.ok) {
+            const chatData = await chatResponse.json();
+            response = `🤖 ${chatData.reply}`;
+        } else {
+            throw new Error('API call failed');
+        }
+    } catch (error) {
+        console.error('OpenAI API Error:', error);
+        response = "🤖 I'm your intelligent travel companion! I can help you with:\n\n✈️ Book flights and compare prices\n🏨 Find hotels with best deals\n🚗 Book Uber rides instantly\n🍽️ Discover amazing restaurants\n✨ Find unique hidden places\n💰 Plan your travel budget\n🌤️ Check weather forecasts\n🎁 Get exclusive loyalty deals\n\nTry asking: 'Book an Uber to the airport' or 'Find unique places in Tokyo'!";
+    }
+    break;                    }
                     
                     setMessages(prev => [...prev, { type: 'bot', content: response }]);
                     
